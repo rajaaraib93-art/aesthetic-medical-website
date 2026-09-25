@@ -2,13 +2,21 @@ import { defineQuery } from 'next-sanity'
 
 export const SERVICES_QUERY = defineQuery(`
   *[_type == "service" && defined(slug.current)] | order(order asc) {
-    _id, title, slug, short, body, category
+    _id, title, slug, short, body, category,
+    image { asset->{_id, url, metadata {lqip, dimensions}}, alt }
   }
 `)
 
 export const SERVICE_QUERY = defineQuery(`
   *[_type == "service" && slug.current == $slug][0] {
-    _id, title, slug, short, body, category
+    _id, title, slug, short, body, category,
+    image { asset->{_id, url, metadata {lqip, dimensions}}, alt }
+  }
+`)
+
+export const SITE_SETTINGS_QUERY = defineQuery(`
+  *[_type == "siteSettings"][0] {
+    siteName, heroTitle, heroText, phone, email, whatsapp, stats[] {value, label}
   }
 `)
 
