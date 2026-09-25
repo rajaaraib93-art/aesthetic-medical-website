@@ -1,6 +1,6 @@
-# Aesthetic Medical — Next.js + Sanity starter
+# IARM — Institute of Aesthetic and Regenerative Medicine (Next.js + Sanity)
 
-A clean, mobile-responsive aesthetic medicine website inspired by the information architecture of AAAM (navigation, education/training, course listings, resources, trust signals and contact flows), but designed from scratch with a different visual system and component layout.
+A clean, mobile-responsive website for IARM, inspired by the information architecture of AAAM (navigation, trust signals and contact flows), but designed from scratch with a different visual system, component layout and content.
 
 AAAM reference reviewed: https://www.aaamed.org/
 
@@ -72,14 +72,14 @@ The schemas live under `sanity/schemaTypes/` and are wired into `sanity.config.t
 ## Content architecture
 
 Homepage
-→ Hero → trust stats → services → featured courses → why choose us → faculty → testimonials → CTA
+→ Hero → trust stats → services → testimonials → CTA
 
 Primary pages
 → Services → service detail pages
-→ Training & Courses → course detail pages (starter structure can be expanded)
 → About
-→ Resources/Articles (schema included)
 → Contact
+
+The `course`, `doctor` and `article` schema types are already wired into the Studio for when IARM begins offering courses/certifications or wants to publish faculty profiles and articles — they're just not linked in the nav or rendered on the homepage yet, to avoid showing empty sections.
 
 ## Notes
 

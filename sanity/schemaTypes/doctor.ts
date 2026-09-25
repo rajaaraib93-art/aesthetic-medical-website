@@ -8,5 +8,20 @@ export default defineType({
     defineField({name:'initials',title:'Initials',type:'string'}),
     defineField({name:'active',title:'Show on website',type:'boolean',initialValue:true}),
     defineField({name:'order',title:'Display order',type:'number',initialValue:10}),
+    defineField({
+      name: 'image',
+      title: 'Photo',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alt text',
+          description: 'Describe the image for screen readers and SEO',
+          validation: (Rule) => Rule.required(),
+        },
+      ],
+    }),
   ],
 })
