@@ -11,5 +11,20 @@ export default defineType({
     defineField({ name:'short', title:'Short description', type:'text', rows:3, validation:r=>r.required() }),
     defineField({ name:'body', title:'Long description', type:'text', rows:8 }),
     defineField({ name:'order', title:'Display order', type:'number', initialValue:10 }),
+    defineField({
+      name: 'image',
+      title: 'Service image',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alt text',
+          description: 'Describe the image for screen readers and SEO',
+          validation: (Rule) => Rule.required(),
+        },
+      ],
+    }),
   ],
 })
