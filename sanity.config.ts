@@ -6,7 +6,7 @@ import { projectId, dataset } from './sanity/env'
 export default defineConfig({
   basePath: '/studio',
   name: 'aesthera-medical',
-  title: 'Aesthera Medical CMS',
+  title: 'IARM CMS',
   projectId,
   dataset,
   plugins: [structureTool()],
