@@ -18,6 +18,6 @@ jobs:
         with:
           node-version: 22
       - run: npm install
-      - run: npx sanity@latest schema deploy --workspace aesthera-medical --yes
+      - run: npx sanity@latest schema deploy --workspace aesthera-medical
         env:
           SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
