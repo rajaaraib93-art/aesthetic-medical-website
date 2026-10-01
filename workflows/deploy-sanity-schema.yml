@@ -1,0 +1,22 @@
+name: Deploy Sanity schema
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sanity/**'
+      - 'sanity.config.ts'
+      - 'sanity.cli.ts'
+
+jobs:
+  deploy-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx sanity@latest schema deploy --workspace aesthera-medical --yes
+        env:
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
