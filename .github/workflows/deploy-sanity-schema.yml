@@ -21,3 +21,5 @@ jobs:
       - run: npx sanity@latest schema deploy --workspace aesthera-medical
         env:
           SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: 9k8qvlvc
+          NEXT_PUBLIC_SANITY_DATASET: production
