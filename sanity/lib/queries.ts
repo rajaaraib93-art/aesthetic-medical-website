@@ -33,3 +33,7 @@ export const FACULTY_QUERY = defineQuery(`
 export const TESTIMONIALS_QUERY = defineQuery(`
   *[_type == "testimonial"] | order(order asc) { _id, quote, name, role }
 `)
+
+export const FAQS_QUERY = defineQuery(`
+  *[_type == "faq"] | order(order asc) { _id, question, answer }
+`)
