@@ -1,8 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ConcernFinder } from '@/components/ConcernFinder'
+import { CountUp } from '@/components/CountUp'
 import { FaqAccordion } from '@/components/FaqAccordion'
+import { HeroMotion } from '@/components/HeroMotion'
 import { ProcessSteps } from '@/components/ProcessSteps'
+import { Reveal } from '@/components/Reveal'
 import { TestimonialReel } from '@/components/TestimonialReel'
 import { fallbackFaqs, fallbackServices, fallbackStats, fallbackTestimonials } from '@/data'
 import { client } from '@/sanity/lib/client'
@@ -41,7 +44,7 @@ export default async function Home() {
   return (
     <>
       {/* HERO */}
-      <section className="hero">
+      <HeroMotion className="hero">
         <div className="container hero-grid">
           <div className="hero-copy">
             <div className="kicker">AESTHETIC MEDICINE · REGENERATIVE CARE</div>
@@ -56,21 +59,25 @@ export default async function Home() {
         </div>
         <div className="marquee"><div className="marquee-track">{[...marqueeNames, ...marqueeNames].map((n,i)=><span key={i}>{n}</span>)}</div></div>
         {settings.stats.length > 0 && (
-          <div className="container stats"><div className="stats-grid">{settings.stats.map((s) => <div className="stat" key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>)}</div></div>
+          <div className="container stats">
+            <Reveal className="stats-grid" stagger>
+              {settings.stats.map((s) => <div className="stat" key={s.label}><strong><CountUp value={s.value} /></strong><span>{s.label}</span></div>)}
+            </Reveal>
+          </div>
         )}
-      </section>
+      </HeroMotion>
 
       {/* TRUST STATS (placeholder) */}
       <section className="section" style={{paddingBottom:0}}>
-        <div className="container stats-grid">
-          {fallbackStats.map(s => <div className="stat" key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>)}
-        </div>
+        <Reveal className="container stats-grid" stagger>
+          {fallbackStats.map(s => <div className="stat" key={s.label}><strong><CountUp value={s.value} /></strong><span>{s.label}</span></div>)}
+        </Reveal>
       </section>
 
       {/* CONCERN FINDER */}
       <section className="section" id="services">
         <div className="container">
-          <div className="section-head"><div><div className="kicker">Find your treatment</div><h2>Browse by category.</h2></div><p>Filter by category to find the right treatment. Every card links to the full service page.</p></div>
+          <Reveal className="section-head"><div><div className="kicker">Find your treatment</div><h2>Browse by category.</h2></div><p>Filter by category to find the right treatment. Every card links to the full service page.</p></Reveal>
           <ConcernFinder services={services} />
         </div>
       </section>
@@ -78,7 +85,7 @@ export default async function Home() {
       {/* PROCESS */}
       <section className="section" style={{background:'var(--soft)'}}>
         <div className="container">
-          <div className="section-head"><div><div className="kicker">The IARM process</div><h2>From first consult to lasting results.</h2></div></div>
+          <Reveal className="section-head"><div><div className="kicker">The IARM process</div><h2>From first consult to lasting results.</h2></div></Reveal>
           <ProcessSteps />
         </div>
       </section>
@@ -86,14 +93,14 @@ export default async function Home() {
       {/* VIDEO/TESTIMONIAL REEL */}
       <section className="section">
         <div className="container">
-          <div className="section-head"><div><div className="kicker">Client stories</div><h2>Hear it from our patients.</h2></div><p className="muted">Placeholder reel — swap in real video testimonials (with consent) when available.</p></div>
+          <Reveal className="section-head"><div><div className="kicker">Client stories</div><h2>Hear it from our patients.</h2></div><p className="muted">Placeholder reel — swap in real video testimonials (with consent) when available.</p></Reveal>
           <TestimonialReel testimonials={testimonials} />
         </div>
       </section>
 
       {/* SINGLE-CLINIC LOCATION BLOCK */}
       <section className="section" style={{background:'var(--soft)'}}>
-        <div className="container grid-2">
+        <Reveal className="container grid-2" stagger>
           <div>
             <div className="kicker">Visit us</div>
             <h2>One clinic, easy to find.</h2>
@@ -101,19 +108,19 @@ export default async function Home() {
             <p className="muted">DHA Phase 6, Sector A, 67-A (4th Floor), Lahore</p>
           </div>
           <div className="service-media"><Image src="https://picsum.photos/seed/iarm-clinic/480/360" alt="Clinic location placeholder" width={480} height={360} /></div>
-        </div>
+        </Reveal>
       </section>
 
       {/* FAQ */}
       <section className="section">
         <div className="container">
-          <div className="section-head"><div><div className="kicker">FAQs</div><h2>Questions, answered honestly.</h2></div></div>
+          <Reveal className="section-head"><div><div className="kicker">FAQs</div><h2>Questions, answered honestly.</h2></div></Reveal>
           <FaqAccordion faqs={faqs} />
         </div>
       </section>
 
       {/* FINAL CTA */}
-      <section className="section" style={{paddingTop:26}}><div className="container cta"><div><div className="kicker" style={{color:'#b7d0c2'}}>Start here</div><h2 style={{color:'#fff',marginBottom:12}}>Turn interest into a consultation.</h2><p>Use the contact flow for consultations and general enquiries.</p></div><Link href="/contact" className="btn btn-light">Contact the clinic →</Link></div></section>
+      <section className="section" style={{paddingTop:26}}><Reveal className="container cta" y={40}><div><div className="kicker" style={{color:'#b7d0c2'}}>Start here</div><h2 style={{color:'#fff',marginBottom:12}}>Turn interest into a consultation.</h2><p>Use the contact flow for consultations and general enquiries.</p></div><Link href="/contact" className="btn btn-light">Contact the clinic →</Link></Reveal></section>
     </>
   )
 }

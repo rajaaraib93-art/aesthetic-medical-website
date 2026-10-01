@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
+import { SmoothScroll } from '@/components/SmoothScroll'
 import { getSiteSettings } from '@/sanity/lib/settings'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -30,6 +31,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en">
       <body>
+        <SmoothScroll />
         <div className="site-shell">
           <SiteHeader siteName={settings.siteName} />
           <main>{children}</main>
