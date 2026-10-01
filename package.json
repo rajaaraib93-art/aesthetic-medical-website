@@ -1,5 +1,5 @@
 {
-  "name": "iarm-website",
+  "name": "aesthetic-medical-site",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -12,13 +12,18 @@
     "studio:deploy": "sanity deploy"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@sanity/image-url": "^2.0.2",
+    "gsap": "^3.13.0",
+    "lenis": "^1.3.0",
+    "motion": "^12.0.0",
     "next": "16.3.4",
     "next-sanity": "13.3.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "sanity": "6.12.0",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "swiper": "^11.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.18.0",
