@@ -53,25 +53,21 @@ export const journey = {
     {
       label: 'Consult',
       title: 'A doctor listens first',
-      text: 'Your concerns, history and goals are discussed in an unhurried consultation before anything is recommended.',
       points: ['Full history and examination', 'Your goals, in your words', 'An honest answer on what will and will not help'],
     },
     {
       label: 'Plan',
       title: 'A plan made for you',
-      text: 'You receive a clear plan: what is recommended, why, how many sessions, and what it will cost.',
       points: ['Treatment and course explained', 'Costs set out before you decide', 'Realistic expectations'],
     },
     {
       label: 'Treat',
       title: 'Careful, comfortable treatment',
-      text: 'Treatment is carried out to a written protocol, with your comfort and safety checked throughout.',
       points: ['Clinical protocols', 'Comfort and safety checks', 'Aftercare explained in detail'],
     },
     {
       label: 'Review',
       title: 'Results reviewed, not assumed',
-      text: 'We review how you are responding and adjust the plan, so your care keeps pace with your progress.',
       points: ['Follow-up reviews', 'Plan adjusted to your response', 'Support after your course ends'],
     },
   ],
