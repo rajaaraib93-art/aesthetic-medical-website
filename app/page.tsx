@@ -1,15 +1,40 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { BeforeAfterSlider } from '@/components/BeforeAfterSlider'
+import { BigCta } from '@/components/BigCta'
+import { BookingWizard } from '@/components/BookingWizard'
 import { ConcernFinder } from '@/components/ConcernFinder'
 import { CountUp } from '@/components/CountUp'
+import { DoctorSection } from '@/components/DoctorSection'
+import { ExperienceBand } from '@/components/ExperienceBand'
 import { FaqAccordion } from '@/components/FaqAccordion'
 import { HeroMotion } from '@/components/HeroMotion'
-import { ProcessSteps } from '@/components/ProcessSteps'
+import { JourneyStory } from '@/components/JourneyStory'
+import { MagneticLink } from '@/components/MagneticLink'
+import { MensHealth } from '@/components/MensHealth'
 import { Reveal } from '@/components/Reveal'
+import { SignatureProgramme } from '@/components/SignatureProgramme'
 import { TestimonialReel } from '@/components/TestimonialReel'
+import { TrustPillars } from '@/components/TrustPillars'
+import { VideoReel } from '@/components/VideoReel'
 import { fallbackFaqs, fallbackServices, fallbackStats, fallbackTestimonials } from '@/data'
+import {
+  beforeAfter,
+  doctors,
+  experience,
+  finalCta,
+  heroMedia,
+  heroExtras,
+  journey,
+  mensHealth,
+  resultVideos,
+  signature,
+  treatmentVideos,
+  trustPillars,
+  wizard,
+} from '@/homeContent'
+import { whatsappHref } from '@/lib/contactLinks'
 import { client } from '@/sanity/lib/client'
-import { urlFor } from '@/sanity/lib/image'
 import { FAQS_QUERY, SERVICES_QUERY, TESTIMONIALS_QUERY } from '@/sanity/lib/queries'
 import { getSiteSettings } from '@/sanity/lib/settings'
 
@@ -40,57 +65,102 @@ async function getContent() {
 export default async function Home() {
   const { services, testimonials, faqs, settings } = await getContent()
   const marqueeNames = services.map((s: any) => s.title)
+  const stats = settings.stats.length > 0 ? settings.stats : fallbackStats
+  const ctaWhatsapp = whatsappHref(settings.whatsapp || settings.phone, `Hello ${settings.siteName}, I would like to book a consultation.`)
 
   return (
     <>
-      {/* HERO */}
-      <HeroMotion className="hero">
-        <div className="container hero-grid">
-          <div className="hero-copy">
-            <div className="kicker">AESTHETIC MEDICINE · REGENERATIVE CARE</div>
-            <h1>{settings.heroTitle}</h1>
-            <p>{settings.heroText}</p>
-            <div className="hero-actions"><Link href="/contact" className="btn btn-primary">Book a consultation</Link><Link href="/services" className="btn btn-ghost">Explore treatments</Link></div>
-            <div className="rating-badge">★★★★★ <strong>[X.X]</strong> <span className="muted">— placeholder rating, replace with real reviews</span></div>
-          </div>
+      {/* HERO: full-bleed cinematic */}
+      <HeroMotion className="hero hero-cine">
+        <div className="hero-stage">
           <div className="hero-art" aria-hidden="true">
-            <Image src="https://picsum.photos/seed/iarm-hero/760/900" alt="Clinic placeholder image" width={760} height={900} style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:20}} priority />
+            {heroMedia.videoSrc ? (
+              <video src={heroMedia.videoSrc} poster={heroMedia.poster || undefined} autoPlay muted loop playsInline />
+            ) : (
+              <Image src="https://picsum.photos/seed/iarm-hero/1600/1000" alt="" width={1600} height={1000} priority />
+            )}
           </div>
+          <div className="hero-overlay" aria-hidden="true" />
+          <div className="container">
+            <div className="hero-copy">
+              <div className="kicker">AESTHETIC MEDICINE · REGENERATIVE CARE</div>
+              <h1>{settings.heroTitle}</h1>
+              <p>{settings.heroText}</p>
+              <div className="hero-actions">
+                <MagneticLink href="/contact" className="btn btn-primary">Book a consultation</MagneticLink>
+                <Link href="/services" className="btn btn-ghost">Explore treatments</Link>
+              </div>
+              <div className="rating-badge">★★★★★ <strong>[X.X]</strong> <span>— placeholder rating, replace with real reviews</span></div>
+            </div>
+          </div>
+          <div className="scroll-hint" aria-hidden="true"><span>{heroExtras.scrollLabel}</span><i /></div>
         </div>
-        <div className="marquee"><div className="marquee-track">{[...marqueeNames, ...marqueeNames].map((n,i)=><span key={i}>{n}</span>)}</div></div>
-        {settings.stats.length > 0 && (
-          <div className="container stats">
-            <Reveal className="stats-grid" stagger>
-              {settings.stats.map((s) => <div className="stat" key={s.label}><strong><CountUp value={s.value} /></strong><span>{s.label}</span></div>)}
-            </Reveal>
-          </div>
-        )}
+        <div className="marquee"><div className="marquee-track">{[...marqueeNames, ...marqueeNames].map((n, i) => <span key={i}>{n}</span>)}</div></div>
       </HeroMotion>
 
-      {/* TRUST STATS (placeholder) */}
-      <section className="section" style={{paddingBottom:0}}>
+      {/* NUMBERS */}
+      <section className="section" style={{ paddingBottom: 0 }}>
         <Reveal className="container stats-grid" stagger>
-          {fallbackStats.map(s => <div className="stat" key={s.label}><strong><CountUp value={s.value} /></strong><span>{s.label}</span></div>)}
+          {stats.map((s: any) => <div className="stat" key={s.label}><strong><CountUp value={s.value} /></strong><span>{s.label}</span></div>)}
         </Reveal>
       </section>
 
-      {/* CONCERN FINDER */}
-      <section className="section" id="services">
+      {/* START HERE: booking wizard */}
+      <section className="section" id="start">
+        <div className="container wizard-grid">
+          <Reveal>
+            <div className="kicker">{wizard.eyebrow}</div>
+            <h2>{wizard.heading}</h2>
+            <p>{wizard.intro}</p>
+            <ul className="tick-list">
+              {wizard.points.map((p) => <li key={p}>{p}</li>)}
+            </ul>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <BookingWizard interests={wizard.interests} times={wizard.times} clinicName={settings.siteName} whatsapp={settings.whatsapp} phone={settings.phone} />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* FIND YOUR TREATMENT */}
+      <section className="section" id="services" style={{ background: 'var(--soft)' }}>
         <div className="container">
           <Reveal className="section-head"><div><div className="kicker">Find your treatment</div><h2>Browse by category.</h2></div><p>Filter by category to find the right treatment. Every card links to the full service page.</p></Reveal>
           <ConcernFinder services={services} />
         </div>
       </section>
 
-      {/* PROCESS */}
-      <section className="section" style={{background:'var(--soft)'}}>
+      {/* TRUST PILLARS */}
+      <TrustPillars pillars={trustPillars} />
+
+      {/* JOURNEY (scroll-driven story) */}
+      <JourneyStory eyebrow={journey.eyebrow} heading={journey.heading} steps={journey.steps} />
+
+      {/* SIGNATURE TREATMENTS */}
+      <SignatureProgramme eyebrow={signature.eyebrow} heading={signature.heading} intro={signature.intro} cta={signature.cta} items={signature.items} />
+
+      {/* WATCH REAL TREATMENTS */}
+      <VideoReel eyebrow={treatmentVideos.eyebrow} heading={treatmentVideos.heading} intro={treatmentVideos.intro} items={treatmentVideos.items} />
+
+      {/* BEFORE / AFTER */}
+      <section className="section" style={{ background: 'var(--soft)' }}>
         <div className="container">
-          <Reveal className="section-head"><div><div className="kicker">The IARM process</div><h2>From first consult to lasting results.</h2></div></Reveal>
-          <ProcessSteps />
+          <Reveal className="section-head"><div><div className="kicker">{beforeAfter.eyebrow}</div><h2>{beforeAfter.heading}</h2></div><p>{beforeAfter.intro}</p></Reveal>
+          <Reveal>
+            <BeforeAfterSlider before={beforeAfter.before || undefined} after={beforeAfter.after || undefined} />
+            <p className="muted" style={{ fontSize: 13, marginTop: 14 }}>{beforeAfter.note}</p>
+          </Reveal>
         </div>
       </section>
 
-      {/* VIDEO/TESTIMONIAL REEL */}
+      {/* EXPERIENCE + DOCTORS */}
+      <ExperienceBand {...experience} />
+      <DoctorSection eyebrow={doctors.eyebrow} heading={doctors.heading} items={doctors.items} />
+
+      {/* MEN'S HEALTH */}
+      <MensHealth eyebrow={mensHealth.eyebrow} lines={mensHealth.lines} text={mensHealth.text} cta={mensHealth.cta} />
+
+      {/* CLIENT STORIES */}
       <section className="section">
         <div className="container">
           <Reveal className="section-head"><div><div className="kicker">Client stories</div><h2>Hear it from our patients.</h2></div><p className="muted">Placeholder reel — swap in real video testimonials (with consent) when available.</p></Reveal>
@@ -98,8 +168,11 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* WALL OF RESULTS */}
+      <VideoReel variant="wall" eyebrow={resultVideos.eyebrow} heading={resultVideos.heading} intro={resultVideos.intro} items={resultVideos.items} />
+
       {/* SINGLE-CLINIC LOCATION BLOCK */}
-      <section className="section" style={{background:'var(--soft)'}}>
+      <section className="section" style={{ background: 'var(--soft)' }}>
         <Reveal className="container grid-2" stagger>
           <div>
             <div className="kicker">Visit us</div>
@@ -120,7 +193,7 @@ export default async function Home() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="section" style={{paddingTop:26}}><Reveal className="container cta" y={40}><div><div className="kicker" style={{color:'#b7d0c2'}}>Start here</div><h2 style={{color:'#fff',marginBottom:12}}>Turn interest into a consultation.</h2><p>Use the contact flow for consultations and general enquiries.</p></div><Link href="/contact" className="btn btn-light">Contact the clinic →</Link></Reveal></section>
+      <BigCta lines={finalCta.lines} button={finalCta.button} location={finalCta.location} whatsappUrl={ctaWhatsapp} />
     </>
   )
 }

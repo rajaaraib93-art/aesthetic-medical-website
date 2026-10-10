@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
+import { FloatingCta } from '@/components/FloatingCta'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { getSiteSettings } from '@/sanity/lib/settings'
 
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <main>{children}</main>
           <SiteFooter siteName={settings.siteName} phone={settings.phone} email={settings.email} whatsapp={settings.whatsapp} />
         </div>
+        <FloatingCta whatsapp={settings.whatsapp} phone={settings.phone} siteName={settings.siteName} />
       </body>
     </html>
   )
