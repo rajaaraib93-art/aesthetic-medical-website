@@ -27,7 +27,7 @@ export function HeroMotion({ children, className }: { children: ReactNode; class
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const h1 = root.querySelector('h1')
         const art = root.querySelector('.hero-art')
-        const img = root.querySelector('.hero-art img')
+        const img = root.querySelector('.hero-art img, .hero-art video')
 
         gsap.from('.hero-copy .kicker', { opacity: 0, y: 16, duration: 0.7, ease: 'power3.out' })
 
@@ -59,8 +59,8 @@ export function HeroMotion({ children, className }: { children: ReactNode; class
         if (art) {
           gsap.fromTo(
             art,
-            { clipPath: 'inset(10% 10% 10% 10% round 32px)', opacity: 0.4 },
-            { clipPath: 'inset(0% 0% 0% 0% round 32px)', opacity: 1, duration: 1.4, ease: 'power4.out' }
+            { clipPath: 'inset(8% 8% 8% 8%)', opacity: 0.4 },
+            { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, duration: 1.4, ease: 'power4.out' }
           )
         }
 
