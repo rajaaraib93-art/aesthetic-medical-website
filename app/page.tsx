@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { AllServices } from '@/components/AllServices'
 import { BeforeAfterSlider } from '@/components/BeforeAfterSlider'
 import { BigCta } from '@/components/BigCta'
 import { BookingWizard } from '@/components/BookingWizard'
@@ -17,7 +18,7 @@ import { SignatureProgramme } from '@/components/SignatureProgramme'
 import { TestimonialReel } from '@/components/TestimonialReel'
 import { TrustPillars } from '@/components/TrustPillars'
 import { VideoReel } from '@/components/VideoReel'
-import { fallbackFaqs, fallbackServices, fallbackStats, fallbackTestimonials } from '@/data'
+import { fallbackFaqs, fallbackProcessSteps, fallbackServices, fallbackStats, fallbackTestimonials } from '@/data'
 import {
   beforeAfter,
   doctors,
@@ -34,6 +35,7 @@ import {
   wizard,
 } from '@/homeContent'
 import { whatsappHref } from '@/lib/contactLinks'
+import { toNavServices } from '@/lib/services'
 import { client } from '@/sanity/lib/client'
 import { FAQS_QUERY, SERVICES_QUERY, TESTIMONIALS_QUERY } from '@/sanity/lib/queries'
 import { getSiteSettings } from '@/sanity/lib/settings'
@@ -65,6 +67,13 @@ async function getContent() {
 export default async function Home() {
   const { services, testimonials, faqs, settings } = await getContent()
   const marqueeNames = services.map((s: any) => s.title)
+  const navServices = toNavServices(services)
+  const journeySteps = fallbackProcessSteps.map((p, i) => ({
+    label: p.title,
+    title: journey.steps[i]?.title ?? p.title,
+    text: p.body,
+    points: journey.steps[i]?.points ?? [],
+  }))
   const stats = settings.stats.length > 0 ? settings.stats : fallbackStats
   const ctaWhatsapp = whatsappHref(settings.whatsapp || settings.phone, `Hello ${settings.siteName}, I would like to book a consultation.`)
 
@@ -130,11 +139,14 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ALL SERVICES */}
+      <AllServices services={navServices} />
+
       {/* TRUST PILLARS */}
       <TrustPillars pillars={trustPillars} />
 
       {/* JOURNEY (scroll-driven story) */}
-      <JourneyStory eyebrow={journey.eyebrow} heading={journey.heading} steps={journey.steps} />
+      <JourneyStory eyebrow={journey.eyebrow} heading={journey.heading} steps={journeySteps} />
 
       {/* SIGNATURE TREATMENTS */}
       <SignatureProgramme eyebrow={signature.eyebrow} heading={signature.heading} intro={signature.intro} cta={signature.cta} items={signature.items} />

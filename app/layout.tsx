@@ -4,6 +4,7 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import { FloatingCta } from '@/components/FloatingCta'
 import { SmoothScroll } from '@/components/SmoothScroll'
+import { getServices, groupByCategory, toNavServices } from '@/lib/services'
 import { getSiteSettings } from '@/sanity/lib/settings'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -29,14 +30,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const settings = await getSiteSettings()
+  const navServices = toNavServices(await getServices())
+  const groups = groupByCategory(navServices)
   return (
     <html lang="en">
       <body>
         <SmoothScroll />
         <div className="site-shell">
-          <SiteHeader siteName={settings.siteName} />
+          <SiteHeader siteName={settings.siteName} phone={settings.phone} groups={groups} />
           <main>{children}</main>
-          <SiteFooter siteName={settings.siteName} phone={settings.phone} email={settings.email} whatsapp={settings.whatsapp} />
+          <SiteFooter siteName={settings.siteName} phone={settings.phone} email={settings.email} whatsapp={settings.whatsapp} services={navServices} />
         </div>
         <FloatingCta whatsapp={settings.whatsapp} phone={settings.phone} siteName={settings.siteName} />
       </body>
