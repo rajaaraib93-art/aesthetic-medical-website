@@ -7,9 +7,9 @@ import { telHref } from '@/lib/contactLinks'
 import type { NavService } from '@/lib/services'
 
 type Group = { category: string; items: NavService[] }
-type Props = { siteName?: string; phone?: string | null; groups?: Group[] }
+type Props = { siteName?: string; phone?: string | null; groups?: Group[]; announcement?: string }
 
-export function SiteHeader({ siteName = 'IARM', phone, groups = [] }: Props) {
+export function SiteHeader({ siteName = 'IARM', phone, groups = [], announcement = 'Medical aesthetics & regenerative care · Book a consultation' }: Props) {
   const [drawer, setDrawer] = useState(false)
   const [mega, setMega] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -66,7 +66,7 @@ export function SiteHeader({ siteName = 'IARM', phone, groups = [] }: Props) {
   return (
     <MotionConfig reducedMotion="user">
       <div className="announcement">
-        <Link href="/contact">Medical aesthetics &amp; regenerative care · Book a consultation</Link>
+        <Link href="/contact">{announcement}</Link>
       </div>
       <header className={`header${hidden && !mega && !drawer ? ' is-hidden' : ''}${scrolled ? ' is-scrolled' : ''}`}>
         <div className="container navbar">

@@ -52,7 +52,7 @@ function VideoTile({ item, onOpen }: { item: VideoItem; onOpen: (v: VideoItem) =
       aria-label={hasVideo ? `Play ${item.title}` : `${item.title} (video coming soon)`}
     >
       {hasVideo && <video ref={ref} src={item.videoSrc} poster={item.poster} muted loop playsInline preload="metadata" />}
-      <span className="vr-tag">{item.tag}</span>
+      {item.tag && <span className="vr-tag">{item.tag}</span>}
       <span className="vr-play" aria-hidden="true">▶</span>
       <span className="vr-title">{item.title}</span>
       {!hasVideo && <span className="vr-soon">Coming soon</span>}

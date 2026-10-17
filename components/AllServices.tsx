@@ -2,16 +2,18 @@ import Link from 'next/link'
 import { Reveal } from '@/components/Reveal'
 import type { NavService } from '@/lib/services'
 
-export function AllServices({ services }: { services: NavService[] }) {
+type Props = { services: NavService[]; eyebrow?: string; heading?: string; intro?: string }
+
+export function AllServices({ services, eyebrow = 'All services', heading = 'Everything we do, in one place.', intro = 'Every treatment has its own page with the full detail.' }: Props) {
   return (
     <section className="section">
       <div className="container">
         <Reveal className="section-head">
           <div>
-            <div className="kicker">All services</div>
-            <h2>Everything we do, in one place.</h2>
+            <div className="kicker">{eyebrow}</div>
+            <h2>{heading}</h2>
           </div>
-          <p>Every treatment has its own page with the full detail.</p>
+          <p>{intro}</p>
         </Reveal>
         <Reveal className="allsvc-grid" stagger>
           {services.map((s) => (
