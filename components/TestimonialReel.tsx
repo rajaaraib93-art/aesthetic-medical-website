@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { FreeMode } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/free-mode'
+import './slider-fix.css'
 
 type Testimonial = { _id?: string; quote: string; name: string; role?: string }
 

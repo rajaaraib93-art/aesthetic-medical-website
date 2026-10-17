@@ -6,6 +6,7 @@ import { FreeMode } from 'swiper/modules'
 import { AnimatePresence, MotionConfig, motion } from 'motion/react'
 import 'swiper/css'
 import 'swiper/css/free-mode'
+import './slider-fix.css'
 import type { VideoItem } from '@/homeContent'
 
 type Props = { eyebrow: string; heading: string; intro: string; items: VideoItem[]; variant?: 'default' | 'wall' }

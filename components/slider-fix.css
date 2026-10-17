@@ -1,0 +1,15 @@
+/*
+ * Slider card widths.
+ * Swiper's own stylesheet makes every slide 100% wide, which overrode the card widths
+ * set in globals.css and stretched the video tiles and testimonial cards. These rules are
+ * more specific, so the intended widths win. Card height follows from the tile's aspect ratio.
+ */
+.vr-swiper .vr-slide { width:230px; }
+.vr-wall .vr-swiper .vr-slide { width:200px; }
+.tr-swiper .tr-slide { width:300px; height:auto; }
+
+@media (max-width: 640px) {
+  .vr-swiper .vr-slide { width:190px; }
+  .vr-wall .vr-swiper .vr-slide { width:170px; }
+  .tr-swiper .tr-slide { width:270px; }
+}
