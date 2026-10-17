@@ -37,3 +37,49 @@ export const TESTIMONIALS_QUERY = defineQuery(`
 export const FAQS_QUERY = defineQuery(`
   *[_type == "faq"] | order(order asc) { _id, question, answer }
 `)
+
+export const HOME_DOCTORS_QUERY = defineQuery(`
+  *[_type == "doctor" && active == true] | order(order asc) {
+    _id, name, role, initials, "imageUrl": image.asset->url
+  }
+`)
+
+export const HOME_PAGE_QUERY = defineQuery(`
+  *[_type == "homePage"][0] {
+    announcement,
+    hero {
+      kicker, ctaPrimary, ctaSecondary, ratingValue, ratingLabel, scrollLabel,
+      "imageUrl": image.asset->url, "imageAlt": image.alt,
+      "videoSrc": coalesce(video.asset->url, videoUrl),
+      "posterUrl": poster.asset->url
+    },
+    finder { eyebrow, heading, intro },
+    allServices { eyebrow, heading, intro },
+    wizard { eyebrow, heading, intro, points, interests, times },
+    trustPillars[] { title, text },
+    journey {
+      eyebrow, heading,
+      steps[] { label, title, text, points, "imageUrl": image.asset->url }
+    },
+    signature { eyebrow, heading, intro, ctaLabel, items[] { title, tagline } },
+    treatmentVideos {
+      eyebrow, heading, intro,
+      items[] { title, tag, "videoSrc": coalesce(video.asset->url, videoUrl), "poster": poster.asset->url }
+    },
+    beforeAfter {
+      eyebrow, heading, intro, note, consentConfirmed,
+      "beforeUrl": before.asset->url, "afterUrl": after.asset->url
+    },
+    experience { eyebrow, headingStart, headingEmphasis, text, primaryLabel, primaryHref, secondaryLabel, secondaryHref },
+    doctors { eyebrow, heading },
+    mensHealth { eyebrow, lines, text, ctaLabel, ctaHref },
+    clientStories { eyebrow, heading, intro },
+    resultVideos {
+      eyebrow, heading, intro,
+      items[] { title, tag, consent, "videoSrc": coalesce(video.asset->url, videoUrl), "poster": poster.asset->url }
+    },
+    location { eyebrow, heading, address, "imageUrl": image.asset->url, "imageAlt": image.alt },
+    faq { eyebrow, heading },
+    finalCta { lines, button, location }
+  }
+`)
