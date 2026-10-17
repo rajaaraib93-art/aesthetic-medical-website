@@ -18,25 +18,12 @@ import { SignatureProgramme } from '@/components/SignatureProgramme'
 import { TestimonialReel } from '@/components/TestimonialReel'
 import { TrustPillars } from '@/components/TrustPillars'
 import { VideoReel } from '@/components/VideoReel'
-import { fallbackFaqs, fallbackProcessSteps, fallbackServices, fallbackStats, fallbackTestimonials } from '@/data'
-import {
-  beforeAfter,
-  doctors,
-  experience,
-  finalCta,
-  heroMedia,
-  heroExtras,
-  journey,
-  mensHealth,
-  resultVideos,
-  signature,
-  treatmentVideos,
-  trustPillars,
-  wizard,
-} from '@/homeContent'
+import { fallbackFaqs, fallbackServices, fallbackStats, fallbackTestimonials } from '@/data'
 import { whatsappHref } from '@/lib/contactLinks'
+import { resolveHome } from '@/lib/homeResolve'
 import { toNavServices } from '@/lib/services'
 import { client } from '@/sanity/lib/client'
+import { getHomeDoctors, getHomePage } from '@/sanity/lib/homePage'
 import { FAQS_QUERY, SERVICES_QUERY, TESTIMONIALS_QUERY } from '@/sanity/lib/queries'
 import { getSiteSettings } from '@/sanity/lib/settings'
 
@@ -65,15 +52,15 @@ async function getContent() {
 }
 
 export default async function Home() {
-  const { services, testimonials, faqs, settings } = await getContent()
+  const [{ services, testimonials, faqs, settings }, homeCms, homeDoctors] = await Promise.all([
+    getContent(),
+    getHomePage(),
+    getHomeDoctors(),
+  ])
+  const home = resolveHome(homeCms, homeDoctors)
+
   const marqueeNames = services.map((s: any) => s.title)
   const navServices = toNavServices(services)
-  const journeySteps = fallbackProcessSteps.map((p, i) => ({
-    label: p.title,
-    title: journey.steps[i]?.title ?? p.title,
-    text: p.body,
-    points: journey.steps[i]?.points ?? [],
-  }))
   const stats = settings.stats.length > 0 ? settings.stats : fallbackStats
   const ctaWhatsapp = whatsappHref(settings.whatsapp || settings.phone, `Hello ${settings.siteName}, I would like to book a consultation.`)
 
@@ -83,28 +70,28 @@ export default async function Home() {
       <HeroMotion className="hero hero-cine">
         <div className="hero-stage">
           <div className="hero-art" aria-hidden="true">
-            {heroMedia.videoSrc ? (
-              <video src={heroMedia.videoSrc} poster={heroMedia.poster || undefined} autoPlay muted loop playsInline />
+            {home.hero.videoSrc ? (
+              <video src={home.hero.videoSrc} poster={home.hero.posterUrl || undefined} autoPlay muted loop playsInline />
             ) : (
-              <Image src="https://picsum.photos/seed/iarm-hero/1600/1000" alt="" width={1600} height={1000} priority />
+              <Image src={home.hero.imageUrl} alt={home.hero.imageAlt} width={1600} height={1000} priority unoptimized />
             )}
           </div>
           <div className="hero-overlay" aria-hidden="true" />
           <div className="container">
             <div className="hero-copy">
-              <div className="kicker">AESTHETIC MEDICINE · REGENERATIVE CARE</div>
+              <div className="kicker">{home.hero.kicker}</div>
               <h1>{settings.heroTitle}</h1>
               <p>{settings.heroText}</p>
               <div className="hero-actions">
-                <MagneticLink href="/contact" className="btn btn-primary">Book a consultation</MagneticLink>
-                <Link href="/services" className="btn btn-ghost">Explore treatments</Link>
+                <MagneticLink href="/contact" className="btn btn-primary">{home.hero.ctaPrimary}</MagneticLink>
+                <Link href="/services" className="btn btn-ghost">{home.hero.ctaSecondary}</Link>
               </div>
-              <div className="rating-badge">★★★★★ <strong>[X.X]</strong> <span>— placeholder rating, replace with real reviews</span></div>
+              <div className="rating-badge">★★★★★ <strong>{home.hero.ratingValue}</strong> <span>— {home.hero.ratingLabel}</span></div>
             </div>
           </div>
-          <div className="scroll-hint" aria-hidden="true"><span>{heroExtras.scrollLabel}</span><i /></div>
+          <div className="scroll-hint" aria-hidden="true"><span>{home.hero.scrollLabel}</span><i /></div>
         </div>
-        <div className="marquee"><div className="marquee-track">{[...marqueeNames, ...marqueeNames].map((n, i) => <span key={i}>{n}</span>)}</div></div>
+        <div className="marquee"><div className="marquee-track">{[...marqueeNames, ...marqueeNames].map((n: string, i: number) => <span key={i}>{n}</span>)}</div></div>
       </HeroMotion>
 
       {/* NUMBERS */}
@@ -118,15 +105,15 @@ export default async function Home() {
       <section className="section" id="start">
         <div className="container wizard-grid">
           <Reveal>
-            <div className="kicker">{wizard.eyebrow}</div>
-            <h2>{wizard.heading}</h2>
-            <p>{wizard.intro}</p>
+            <div className="kicker">{home.wizard.eyebrow}</div>
+            <h2>{home.wizard.heading}</h2>
+            <p>{home.wizard.intro}</p>
             <ul className="tick-list">
-              {wizard.points.map((p) => <li key={p}>{p}</li>)}
+              {home.wizard.points.map((p: string) => <li key={p}>{p}</li>)}
             </ul>
           </Reveal>
           <Reveal delay={0.1}>
-            <BookingWizard interests={wizard.interests} times={wizard.times} clinicName={settings.siteName} whatsapp={settings.whatsapp} phone={settings.phone} />
+            <BookingWizard interests={home.wizard.interests} times={home.wizard.times} clinicName={settings.siteName} whatsapp={settings.whatsapp} phone={settings.phone} />
           </Reveal>
         </div>
       </section>
@@ -134,78 +121,78 @@ export default async function Home() {
       {/* FIND YOUR TREATMENT */}
       <section className="section" id="services" style={{ background: 'var(--soft)' }}>
         <div className="container">
-          <Reveal className="section-head"><div><div className="kicker">Find your treatment</div><h2>Browse by category.</h2></div><p>Filter by category to find the right treatment. Every card links to the full service page.</p></Reveal>
+          <Reveal className="section-head"><div><div className="kicker">{home.finder.eyebrow}</div><h2>{home.finder.heading}</h2></div><p>{home.finder.intro}</p></Reveal>
           <ConcernFinder services={services} />
         </div>
       </section>
 
       {/* ALL SERVICES */}
-      <AllServices services={navServices} />
+      <AllServices services={navServices} eyebrow={home.allServices.eyebrow} heading={home.allServices.heading} intro={home.allServices.intro} />
 
       {/* TRUST PILLARS */}
-      <TrustPillars pillars={trustPillars} />
+      <TrustPillars pillars={home.trustPillars} />
 
       {/* JOURNEY (scroll-driven story) */}
-      <JourneyStory eyebrow={journey.eyebrow} heading={journey.heading} steps={journeySteps} />
+      <JourneyStory eyebrow={home.journey.eyebrow} heading={home.journey.heading} steps={home.journey.steps} />
 
       {/* SIGNATURE TREATMENTS */}
-      <SignatureProgramme eyebrow={signature.eyebrow} heading={signature.heading} intro={signature.intro} cta={signature.cta} items={signature.items} />
+      <SignatureProgramme eyebrow={home.signature.eyebrow} heading={home.signature.heading} intro={home.signature.intro} cta={home.signature.cta} items={home.signature.items} />
 
       {/* WATCH REAL TREATMENTS */}
-      <VideoReel eyebrow={treatmentVideos.eyebrow} heading={treatmentVideos.heading} intro={treatmentVideos.intro} items={treatmentVideos.items} />
+      <VideoReel eyebrow={home.treatmentVideos.eyebrow} heading={home.treatmentVideos.heading} intro={home.treatmentVideos.intro} items={home.treatmentVideos.items} />
 
       {/* BEFORE / AFTER */}
       <section className="section" style={{ background: 'var(--soft)' }}>
         <div className="container">
-          <Reveal className="section-head"><div><div className="kicker">{beforeAfter.eyebrow}</div><h2>{beforeAfter.heading}</h2></div><p>{beforeAfter.intro}</p></Reveal>
+          <Reveal className="section-head"><div><div className="kicker">{home.beforeAfter.eyebrow}</div><h2>{home.beforeAfter.heading}</h2></div><p>{home.beforeAfter.intro}</p></Reveal>
           <Reveal>
-            <BeforeAfterSlider before={beforeAfter.before || undefined} after={beforeAfter.after || undefined} />
-            <p className="muted" style={{ fontSize: 13, marginTop: 14 }}>{beforeAfter.note}</p>
+            <BeforeAfterSlider before={home.beforeAfter.before} after={home.beforeAfter.after} />
+            <p className="muted" style={{ fontSize: 13, marginTop: 14 }}>{home.beforeAfter.note}</p>
           </Reveal>
         </div>
       </section>
 
       {/* EXPERIENCE + DOCTORS */}
-      <ExperienceBand {...experience} />
-      <DoctorSection eyebrow={doctors.eyebrow} heading={doctors.heading} items={doctors.items} />
+      <ExperienceBand {...home.experience} />
+      <DoctorSection eyebrow={home.doctors.eyebrow} heading={home.doctors.heading} items={home.doctors.items} />
 
       {/* MEN'S HEALTH */}
-      <MensHealth eyebrow={mensHealth.eyebrow} lines={mensHealth.lines} text={mensHealth.text} cta={mensHealth.cta} />
+      <MensHealth eyebrow={home.mensHealth.eyebrow} lines={home.mensHealth.lines} text={home.mensHealth.text} cta={home.mensHealth.cta} />
 
       {/* CLIENT STORIES */}
       <section className="section">
         <div className="container">
-          <Reveal className="section-head"><div><div className="kicker">Client stories</div><h2>Hear it from our patients.</h2></div><p className="muted">Placeholder reel — swap in real video testimonials (with consent) when available.</p></Reveal>
+          <Reveal className="section-head"><div><div className="kicker">{home.clientStories.eyebrow}</div><h2>{home.clientStories.heading}</h2></div><p className="muted">{home.clientStories.intro}</p></Reveal>
           <TestimonialReel testimonials={testimonials} />
         </div>
       </section>
 
       {/* WALL OF RESULTS */}
-      <VideoReel variant="wall" eyebrow={resultVideos.eyebrow} heading={resultVideos.heading} intro={resultVideos.intro} items={resultVideos.items} />
+      <VideoReel variant="wall" eyebrow={home.resultVideos.eyebrow} heading={home.resultVideos.heading} intro={home.resultVideos.intro} items={home.resultVideos.items} />
 
       {/* SINGLE-CLINIC LOCATION BLOCK */}
       <section className="section" style={{ background: 'var(--soft)' }}>
         <Reveal className="container grid-2" stagger>
           <div>
-            <div className="kicker">Visit us</div>
-            <h2>One clinic, easy to find.</h2>
+            <div className="kicker">{home.location.eyebrow}</div>
+            <h2>{home.location.heading}</h2>
             <p>{settings.phone ? `Call ${settings.phone}` : 'Phone — add to Sanity siteSettings'} {settings.whatsapp ? ' or message us on WhatsApp.' : '.'}</p>
-            <p className="muted">DHA Phase 6, Sector A, 67-A (4th Floor), Lahore</p>
+            <p className="muted">{home.location.address}</p>
           </div>
-          <div className="service-media"><Image src="https://picsum.photos/seed/iarm-clinic/480/360" alt="Clinic location placeholder" width={480} height={360} /></div>
+          <div className="service-media"><Image src={home.location.imageUrl} alt={home.location.imageAlt} width={480} height={360} unoptimized /></div>
         </Reveal>
       </section>
 
       {/* FAQ */}
       <section className="section">
         <div className="container">
-          <Reveal className="section-head"><div><div className="kicker">FAQs</div><h2>Questions, answered honestly.</h2></div></Reveal>
+          <Reveal className="section-head"><div><div className="kicker">{home.faq.eyebrow}</div><h2>{home.faq.heading}</h2></div></Reveal>
           <FaqAccordion faqs={faqs} />
         </div>
       </section>
 
       {/* FINAL CTA */}
-      <BigCta lines={finalCta.lines} button={finalCta.button} location={finalCta.location} whatsappUrl={ctaWhatsapp} />
+      <BigCta lines={home.finalCta.lines} button={home.finalCta.button} location={home.finalCta.location} whatsappUrl={ctaWhatsapp} />
     </>
   )
 }
