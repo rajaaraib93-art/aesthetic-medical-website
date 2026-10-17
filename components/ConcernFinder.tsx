@@ -3,14 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { FreeMode } from 'swiper/modules'
-import type { Swiper as SwiperType } from 'swiper'
 import gsap from 'gsap'
 import { Flip } from 'gsap/Flip'
-import 'swiper/css'
-import 'swiper/css/free-mode'
 import { urlFor } from '@/sanity/lib/image'
+import './concern-finder.css'
 
 gsap.registerPlugin(Flip)
 
@@ -24,6 +20,8 @@ type Service = {
 }
 
 const VISIBLE_CHIPS = 7
+/** Cards shown before the "Show all" button appears (2 rows of 4 on desktop). */
+const INITIAL_CARDS = 8
 
 export function ConcernFinder({ services }: { services: Service[] }) {
   const categories = useMemo(() => {
@@ -35,8 +33,8 @@ export function ConcernFinder({ services }: { services: Service[] }) {
   const [active, setActive] = useState('All')
   const [query, setQuery] = useState('')
   const [showAllChips, setShowAllChips] = useState(false)
-  const railRef = useRef<HTMLDivElement>(null)
-  const swiperRef = useRef<SwiperType | null>(null)
+  const [expanded, setExpanded] = useState(false)
+  const gridRef = useRef<HTMLDivElement>(null)
   const pending = useRef<ReturnType<typeof Flip.getState> | null>(null)
 
   const q = query.trim().toLowerCase()
@@ -46,13 +44,17 @@ export function ConcernFinder({ services }: { services: Service[] }) {
       (!q || `${s.title} ${s.short ?? ''} ${s.category ?? ''}`.toLowerCase().includes(q))
   )
 
+  // While searching, show every match; otherwise cap the list until "Show all" is pressed.
+  const visible = expanded || q ? filtered : filtered.slice(0, INITIAL_CARDS)
+  const hiddenCount = filtered.length - visible.length
+
   const chips = showAllChips || categories.length <= VISIBLE_CHIPS + 1 ? categories : categories.slice(0, VISIBLE_CHIPS)
 
-  /** Records card positions before a filter change so Flip can animate to the new layout. */
+  /** Records card positions before a change so Flip can animate to the new layout. */
   const withFlip = (change: () => void) => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!reduce && railRef.current) {
-      pending.current = Flip.getState(railRef.current.querySelectorAll('.concern-card'))
+    if (!reduce && gridRef.current) {
+      pending.current = Flip.getState(gridRef.current.querySelectorAll('.concern-card'))
     }
     change()
   }
@@ -61,12 +63,7 @@ export function ConcernFinder({ services }: { services: Service[] }) {
     const state = pending.current
     if (!state) return
     pending.current = null
-    const swiper = swiperRef.current
-    if (swiper && !swiper.destroyed) {
-      swiper.update()
-      swiper.slideTo(0, 0)
-    }
-    const targets = railRef.current ? Array.from(railRef.current.querySelectorAll<HTMLElement>('.concern-card')) : []
+    const targets = gridRef.current ? Array.from(gridRef.current.querySelectorAll<HTMLElement>('.concern-card')) : []
     if (!targets.length) return
     Flip.from(state, {
       targets,
@@ -76,7 +73,7 @@ export function ConcernFinder({ services }: { services: Service[] }) {
       onEnter: (els: Element[]) =>
         gsap.fromTo(els, { opacity: 0, y: 20, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, delay: 0.1 }),
     })
-  }, [active, q])
+  }, [active, q, expanded])
 
   return (
     <div>
@@ -88,7 +85,12 @@ export function ConcernFinder({ services }: { services: Service[] }) {
               role="tab"
               aria-selected={active === cat}
               className={`concern-tag ${active === cat ? 'active' : ''}`}
-              onClick={() => withFlip(() => setActive(cat))}
+              onClick={() =>
+                withFlip(() => {
+                  setActive(cat)
+                  setExpanded(false)
+                })
+              }
               type="button"
             >
               {cat}
@@ -111,52 +113,42 @@ export function ConcernFinder({ services }: { services: Service[] }) {
 
       <div className="cf-meta">
         <span className="muted">{filtered.length} {filtered.length === 1 ? 'treatment' : 'treatments'}</span>
-        <span className="cf-arrows">
-          <button type="button" aria-label="Previous" onClick={() => swiperRef.current?.slidePrev()}>←</button>
-          <button type="button" aria-label="Next" onClick={() => swiperRef.current?.slideNext()}>→</button>
-        </span>
       </div>
 
-      <div ref={railRef}>
-        {filtered.length === 0 ? (
-          <p className="muted">No treatments match your search. Try a different word or category.</p>
-        ) : (
-          <Swiper
-            modules={[FreeMode]}
-            slidesPerView="auto"
-            spaceBetween={18}
-            freeMode
-            grabCursor
-            onSwiper={(s) => {
-              swiperRef.current = s
-            }}
-            className="cf-swiper"
-          >
-            {filtered.map((s, i) => {
-              const slug = typeof s.slug === 'string' ? s.slug : s.slug?.current
-              return (
-                <SwiperSlide key={s._id ?? slug} className="cf-slide">
-                  <Link href={`/services/${slug}`} data-flip-id={slug} className="concern-card">
-                    {s.image?.asset?.url ? (
-                      <div className="concern-media">
-                        <Image src={urlFor(s.image).width(320).height(220).fit('crop').url()} alt={s.image.alt || s.title} width={320} height={220} />
-                      </div>
-                    ) : (
-                      <div className="concern-media concern-media-fallback">{String(i + 1).padStart(2, '0')}</div>
-                    )}
-                    <div className="concern-body">
-                      <div className="badge">{s.category}</div>
-                      <h4>{s.title}</h4>
-                      <p>{s.short}</p>
-                      <span className="concern-cta">View treatment →</span>
-                    </div>
-                  </Link>
-                </SwiperSlide>
-              )
-            })}
-          </Swiper>
-        )}
-      </div>
+      {filtered.length === 0 ? (
+        <p className="muted">No treatments match your search. Try a different word or category.</p>
+      ) : (
+        <div ref={gridRef} className="cf-grid">
+          {visible.map((s, i) => {
+            const slug = typeof s.slug === 'string' ? s.slug : s.slug?.current
+            return (
+              <Link key={s._id ?? slug} href={`/services/${slug}`} data-flip-id={slug} className="concern-card">
+                {s.image?.asset?.url ? (
+                  <div className="concern-media">
+                    <Image src={urlFor(s.image).width(640).height(480).fit('crop').url()} alt={s.image.alt || s.title} width={640} height={480} />
+                  </div>
+                ) : (
+                  <div className="concern-media concern-media-fallback">{String(i + 1).padStart(2, '0')}</div>
+                )}
+                <div className="concern-body">
+                  <div className="badge">{s.category}</div>
+                  <h4>{s.title}</h4>
+                  <p>{s.short}</p>
+                  <span className="concern-cta">View treatment →</span>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      )}
+
+      {hiddenCount > 0 && (
+        <div className="cf-more">
+          <button type="button" className="btn btn-ghost" onClick={() => withFlip(() => setExpanded(true))}>
+            Show all {filtered.length} treatments
+          </button>
+        </div>
+      )}
     </div>
   )
 }

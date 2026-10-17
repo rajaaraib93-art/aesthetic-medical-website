@@ -1,0 +1,22 @@
+/* Treatment finder: tidy responsive grid (replaces the stretched slider rail) */
+.cf-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:18px; align-items:stretch; }
+.cf-grid .concern-card { display:flex; flex-direction:column; width:100%; height:100%; min-width:0; }
+.cf-grid .concern-media { aspect-ratio:4 / 3; overflow:hidden; }
+.cf-grid .concern-media img { width:100%; height:100%; object-fit:cover; display:block; }
+.cf-grid .concern-media-fallback { display:flex; align-items:center; justify-content:center; }
+.cf-grid .concern-body p {
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.cf-more { display:flex; justify-content:center; margin-top:28px; }
+
+/* Tablet: two per row */
+@media (max-width: 999px) { .cf-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+/* Phone: swipeable row of cards */
+@media (max-width: 640px) {
+  .cf-grid {
+    display:flex; gap:14px; overflow-x:auto; padding-bottom:10px;
+    scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+  }
+  .cf-grid .concern-card { flex:0 0 78%; scroll-snap-align:start; height:auto; }
+}
